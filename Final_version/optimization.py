@@ -216,8 +216,8 @@ class GoodBroyden(QNewton):
 
             denom = np.dot(v, H @ y)
             if abs(denom) > 1e-12:
-                # Rank 1 update
-                self.H_inv = H + np.outer(v-H@y,v@H) / denom
+                #self.H_inv = H + np.outer(v-H@y,v@H) / denom
+                H_new = H + np.outer(v - H@y, v@H)/denom
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -301,13 +301,11 @@ class SymmetricBroyden(QNewton):
             y = g(x) - self.gp
             H = self.H_inv
 
-            denom1 = np.dot(y,H@y)
-            denom2 = np.dot(v,y)
+            r = v- H @ y
+            denom = np.dot(r,y)
 
-            if abs(denom1) > 1e-12:
-                self.H_inv -= np.outer(H@y,y@H)/denom1
-            if abs(denom2) > 1e-12:
-                self.H_inv -= np.outer(v,v)/denom2
+            if abs(denom) > 1e-8 * np.linalg.norm(r) * np.linalg.norm(y):
+                H_new = H + np.outer(r,r)/denom
         else:
             self.H_inv = np.identity(x.shape[0])
 

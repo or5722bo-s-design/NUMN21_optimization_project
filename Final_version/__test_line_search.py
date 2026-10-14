@@ -18,7 +18,17 @@ def run_rosenbrock(method, x_vals, with_plotting=True):
             )
 
             draw_error_grid(H_errors)
+
+        draw_contour(
+            rosenbrock_fn, steps=steps, print_labels=False, n_levels=14,
+            #title=type(method).__name__,
+            title=type(method).__name__ + (" (exact LS)" if getattr(method, "use_exact_ls", False) else ""),
+            steps_label=f"Steps ({len(steps)-1})",
+        )
+
     print(f"AVERAGE STEPS TAKEN: {step_count / x_vals.shape[0]}")
+
+    
 
 # Setup problems
 rose_pr = Problem(objective=rosenbrock, gradient=rosenbrock_gradient)
@@ -40,5 +50,6 @@ FAILED_POINTS = np.array([
 ])
 
 # points = FAILED_POINTS
-points = np.random.random((40, 2)) * 4 - 1
+#points = np.random.random((40, 2)) * 4 - 1
+points = np.array([[0.0, -0.8]])
 run_rosenbrock(method, points, with_plotting=True)
