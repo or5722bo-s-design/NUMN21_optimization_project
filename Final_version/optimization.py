@@ -1,8 +1,7 @@
 import numpy as np
 import scipy.linalg as linalg
-import scipy.differentiate as differentiate
 from line_search import exact_line_search, arm_wolf_search
-from hessian_approx import finite_diffs
+from hessian_approx import *
 
 class Problem:
     def __init__(self, objective, gradient=None):
@@ -52,6 +51,7 @@ class Optimization():
         # Eval history
         self.step_history = []
         self.error_history = []
+        self.ascent_dir_count = 0
 
     def reset(self):
         """
@@ -59,6 +59,7 @@ class Optimization():
         """
         self.step_history = []
         self.error_history = []
+        self.ascent_dir_count = 0
 
     def line_search(self, x, s):
         """
@@ -68,7 +69,7 @@ class Optimization():
         """
         raise NotImplementedError("Subclass must provide an implementation!")
 
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
         """
         Abstract method - to be overriden by subclass.
 
@@ -113,24 +114,29 @@ class Optimization():
             self.step_history.append(x)
 
             is_inv = False
-            G, is_inv = self.approx_hessian(self.problem.gradient, x)
+            G, is_inv = self.approx_hessian(x)
 
             # Evaluate Hessian (or inverse) approx
-            # G_true = differentiate.hessian(self.problem.objective, x).ddf # TODO Get scipy hess to work with chebyquad
-            G_true = finite_diffs(self.problem.gradient, x, dx=1e-7)
+            G_true = finite_diffs(self.problem.gradient, x, dx=1e-8)
             if is_inv:
-                G_true = np.linalg.inv(G_true)
+                try:
+                    G_true = np.linalg.inv(G_true)
+                except np.linalg.LinAlgError:
+                    G_true = np.nan * np.ones(G_true.shape)
+            self.error_history.append(np.linalg.norm(G - G_true, "fro"))
             
-            # TODO If the Hessian is not symmetric positive definite, this seems to fail...
             if not is_inv:
-                # Solve symmetric linear system
+                # Solve the linear system
                 s = linalg.solve(G, -g)
             else:
                 # Directly compute step direction
                 s = -G @ g
             alpha = self.line_search(x, s)
 
-            self.error_history.append(np.linalg.norm(G - G_true, "fro"))
+            # Update count if the search direction was not a descent direction
+            if alpha < 0:
+                self.ascent_dir_count += 1
+
             x = x + alpha * s
 
         # Return the solution, the and the steps taken, and Hessian errors
@@ -157,17 +163,17 @@ class ClassicalNewton(Optimization):
         """
         
         if self.use_exact_ls:
-            return exact_line_search(self.problem.objective, self.problem.gradient, x, s)
+            return exact_line_search(self.problem, x, s)
         elif self.use_exact_ls == None:
             return 1
         else:
-            return arm_wolf_search(self.problem.objective, self.problem.gradient, x, s)
+            return arm_wolf_search(self.problem, x, s)
 
 
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
         """Uses finite differences to estimate the hessian from the gradient."""
 
-        return finite_diffs(g, x, dx=1e-5), False
+        return finite_diffs(self.problem.gradient, x, dx=1e-5), False
 
 ### Quasi-Newton Implementations
 
@@ -178,10 +184,28 @@ class QNewton(Optimization):
     approximation function.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Previous Hessian approx
+        self.H = None
+        # Previous iteration Hessian (inv) approx
+        self.H_inv = None
+        # x from the previous iteration
+        self.xp = None
+        # f'(x) from the previous iteration
+        self.gp = None
+
+    def reset(self):
+        super().reset()
+        self.H = None
+        self.H_inv = None
+        self.xp = None
+        self.gp = None
+
     def line_search(self, x, s):
         """Line search with Armijo-Wolfe conditions."""
-        
-        return arm_wolf_search(self.problem.objective, self.problem.gradient, x, s)
+
+        return arm_wolf_search(self.problem, x, s)
 
 
 class GoodBroyden(QNewton):
@@ -191,33 +215,16 @@ class GoodBroyden(QNewton):
     Source: A Class of Methods for Solving Nonlinear Simultaneous Equations
             By C. G. Broyden
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # x from the previous iteration
-        self.xp = None
-        # f'(x) from the previous iteration
-        self.gp = None
-        # Previous iteration Hessian (inv) approx
-        self.H_inv = None
     
-    def reset(self):
-        super().reset()
-        self.xp = None
-        self.gp = None
-        self.H_inv = None
-    
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
+        g = self.problem.gradient
+        
         # Update hessian approx
         if not self.xp is None and not self.gp is None:
-            v = x - self.xp
+            s = x - self.xp
             y = g(x) - self.gp
-            H = self.H_inv
 
-            denom = np.dot(v, H @ y)
-            if abs(denom) > 1e-12:
-                #self.H_inv = H + np.outer(v-H@y,v@H) / denom
-                H_new = H + np.outer(v - H@y, v@H)/denom
+            self.H_inv = update_good_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -235,32 +242,15 @@ class BadBroyden(QNewton):
         By C. G. Broyden
     """
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # x from the previous iteration
-        self.xp = None
-        # f'(x) from the previous iteration
-        self.gp = None
-        # Previous iteration Hessian (inv) approx
-        self.H_inv = None
-    
-    def reset(self):
-        super().reset()
-        self.xp = None
-        self.gp = None
-        self.H_inv = None
-    
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
+        g = self.problem.gradient
+
         # Update hessian approx
         if not self.xp is None and not self.gp is None:
-            v = x - self.xp
+            s = x - self.xp
             y = g(x) - self.gp
-            H = self.H_inv
 
-            denom = np.dot(y, y)
-            if abs(denom) > 1e-12:
-                # Rank 1 update
-                self.H_inv = H + np.outer(v-H@y,y) / denom
+            self.H_inv = update_bad_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -279,33 +269,15 @@ class SymmetricBroyden(QNewton):
             By C. G. Broyden
     """
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # x from the previous iteration
-        self.xp = None
-        # f'(x) from the previous iteration
-        self.gp = None
-        # Previous iteration Hessian (inv) approx
-        self.H_inv = None
-    
-    def reset(self):
-        super().reset()
-        self.xp = None
-        self.gp = None
-        self.H_inv = None
-    
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
+        g = self.problem.gradient
+        
         # Update hessian approx
         if not self.xp is None and not self.gp is None:
-            v = x - self.xp
+            s = x - self.xp
             y = g(x) - self.gp
-            H = self.H_inv
 
-            r = v- H @ y
-            denom = np.dot(r,y)
-
-            if abs(denom) > 1e-8 * np.linalg.norm(r) * np.linalg.norm(y):
-                H_new = H + np.outer(r,r)/denom
+            self.H_inv = update_sym_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -319,30 +291,16 @@ class DFP(QNewton):
     """
     Uses the DFP updating formula to update the inv Hessian on each step.
     """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # x from the previous iteration
-        self.xp = None
-        # f'(x) from the previous iteration
-        self.gp = None
-        # Previous iteration Hessian (inv) approx
-        self.H_inv = None
-
-    def reset(self):
-        super().reset()
-        self.xp = None
-        self.gp = None
-        self.H_inv = None
     
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
+        g = self.problem.gradient
+
         # Update hessian approx
         if not self.xp is None and not self.gp is None:
-            v = x - self.xp
+            s = x - self.xp
             y = g(x) - self.gp
-            H = self.H_inv
 
-            self.H_inv = H - (np.outer(H@y,y@H))/(np.dot(y,H@y)) + (np.outer(v,v))/(np.dot(y,v))
+            self.H_inv = update_DFP(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -357,37 +315,19 @@ class BFGS(QNewton):
     Uses the BFGS updating formula to update the inv Hessian on each step.
     """
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # x from the previous iteration
-        self.xp = None
-        # f'(x) from the previous iteration
-        self.gp = None
-        # Previous iteration Hessian (inv) approx
-        self.H_inv = None
-
-    def reset(self):
-        super().reset()
-        self.xp = None
-        self.gp = None
-        self.H_inv = None
-    
-    def approx_hessian(self, g, x):
-        """Uses finite differences to estimate the hessian from the gradient."""
+    def approx_hessian(self, x):
+        g = self.problem.gradient
 
         # Update hessian approx
         if not self.xp is None and not self.gp is None:
-            v = x - self.xp
+            s = x - self.xp
             y = g(x) - self.gp
-            p = 1 / np.dot(y, v)
-            H = self.H_inv
-            I = np.identity(x.shape[0])
 
-            self.H_inv = (I-p*np.outer(v,y))@H@(I-p*np.outer(y,v))+p*np.outer(v,v)
+            self.H_inv = update_BFGS(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
-        # Store x and g_x for next iteration
+        # Store x and g(x) for next iteration
         self.xp = x
         self.gp = g(x)
 
@@ -397,8 +337,8 @@ class BFGS(QNewton):
 
 class InexactLineSearch(Optimization):
     def line_search(self, x, s):
-        return arm_wolf_search(self.problem.objective, self.problem.gradient, x=x, s=s)
+        return arm_wolf_search(self.problem, x=x, s=s)
 
-    def approx_hessian(self, g, x):
+    def approx_hessian(self, x):
         n = x.shape[0]
         return np.identity(n), True

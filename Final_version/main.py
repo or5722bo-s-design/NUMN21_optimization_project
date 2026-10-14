@@ -1,0 +1,129 @@
+import numpy as np
+import scipy.optimize as so
+
+from optimization import *
+from Rosenbrock_problem import rosenbrock, rosenbrock_gradient
+from chebyquad_problem import chebyquad, gradchebyquad
+from plot import draw_error_grid
+
+### Run Optimizer on Rosenbrock ###
+
+rose_problem = Problem(rosenbrock, rosenbrock_gradient)
+
+opts = [
+    {
+        "name": "Classical Newton (exact line search)",
+        "method": ClassicalNewton(problem=rose_problem, use_exact_ls=True),
+    },
+    {
+        "name": "Classical Newton (armijo-wolfe)",
+        "method": ClassicalNewton(problem=rose_problem, use_exact_ls=False),
+    },
+    {
+        "name": "Inexact Line Search (armijo-wolfe)",
+        "method": InexactLineSearch(problem=rose_problem),
+    },
+    {
+        "name": "Good Broyden",
+        "method": GoodBroyden(problem=rose_problem),
+    },
+    {
+        "name": "Bad Broyden (fails)",
+        "method": BadBroyden(problem=rose_problem),
+    },
+    {
+        "name": "Symmetric Broyden",
+        "method": SymmetricBroyden(problem=rose_problem),
+    },
+    {
+        "name": "DFP",
+        "method": DFP(problem=rose_problem),
+    },
+    {
+        "name": "BFGS",
+        "method": BFGS(problem=rose_problem),
+    },
+]
+
+def analyze_solver(name, method, x_points, root):
+    """
+    Runs the solver on all given starting points, collects and prints information
+    about the run.
+    
+    :param name: Name of the method to print in the analysis.
+    :param method: Method which implements the Optimization class.
+    :param x_points: Sample starting points, (m x 2) matrix for Rosenbrock.
+    :param root: Expected minimum to end at.
+    """
+    
+    x_points = np.array(x_points)
+    n = x_points.shape[0]
+    
+    # Accumulated totals
+    step_count = 0
+    ascent_dir_count = 0
+    n2_dist = 0
+
+    for x in x_points:
+        sol = method.solve(x)
+        step_count += (len(method.step_history) - 1)
+        ascent_dir_count += method.ascent_dir_count
+        n2_dist += np.linalg.norm(sol - root)
+    
+    # Printed analysis
+    print(f"--- {name} ---")
+    print(f"\tAVG Root Error: {round(n2_dist / n, 5)}")
+    print(f"\tAVG Steps Taken: {step_count / n}")
+    print(f"\tRatio of ascent steps: {round((ascent_dir_count / step_count) * 100, 3)} %")
+
+# Generate "n" random points, each method will be compared on these same starting values.
+n = 40
+x_points = np.random.random((n, 2)) * 5 - 3
+root = [1., 1.]
+
+print("\nROSENBROCK FUNCTION\n")
+
+# Loop through all methods
+for opt in opts:
+    name = opt["name"]
+    method = opt["method"]
+    analyze_solver(name, method, x_points, root)
+
+print("\n\nCHEBYQUAD FUNCTION\n")
+
+### Run BFGS on Chebyquad ###
+
+def analyze_chebyquad(name, method, size, x):
+    """
+    Runs chebyquad with the given method, and compares to the scipy BFGS optimizer.
+    
+    :param name: Name to display during analysis.
+    :param method: Optimization method.
+    :param size: Number of unknowns in the input space.
+    :param x: Starting point to kick off the algorithm.
+    """
+    
+    sol = method.solve(x)
+    steps = method.step_history
+    H_errors = method.error_history
+    print(f"--- {name} | {size=} ---")
+    print(f"\tCurrent function value: {chebyquad(sol)}")
+    print(f"\tIterations: {len(steps)-1}")
+    # print(f"\tFunction evaluations: TODO!")
+    # print(f"\tGradient evaluations: TODO!")
+
+    draw_error_grid(H_errors)
+
+
+    print("--- FMIN_BFGS ---")
+    xmin = so.fmin_bfgs(chebyquad,x,gradchebyquad)
+    print()
+
+cheby_problem = Problem(chebyquad, gradchebyquad)
+
+for size in [4, 8, 11, 14]:
+    x0 = np.linspace(0, 1, size)
+    name = "BFGS (ours)"
+    method = BFGS(problem=cheby_problem)
+    analyze_chebyquad(name, method, size, x0)
+

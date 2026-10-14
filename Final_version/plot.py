@@ -47,12 +47,9 @@ def draw_contour(
         ax.scatter(x, y, color='blue', s=42, zorder=5, label=steps_label)
         plt.scatter(
             x[-1], y[-1],
-            color='blue',          # Interior fill color
-            edgecolor='red',       # Outline color
-            linewidth=2.5,         # Outline thickness
-            s=50,                  # Larger marker size
-            zorder=10,             # Ensures it stays on top
-            label='Final Step'
+            color='blue', edgecolor='red',
+            linewidth=2.5, s=50, zorder=10,
+            label='Final Step',
         )
 
     # Labels and styling

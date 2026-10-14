@@ -4,6 +4,7 @@ from plot import *
 
 def run_rosenbrock(method, x_vals, with_plotting=True):
     step_count = 0
+    ascent_dir_count = 0
     
     for x in x_vals:
         sol = method.solve(x)
@@ -11,6 +12,7 @@ def run_rosenbrock(method, x_vals, with_plotting=True):
         H_errors = method.error_history
 
         step_count += (len(steps)-1)
+        ascent_dir_count += method.ascent_dir_count
         print(f"Found solution {sol} in {len(steps)-1} steps")
         if with_plotting:
             draw_contour(
@@ -27,6 +29,7 @@ def run_rosenbrock(method, x_vals, with_plotting=True):
         )
 
     print(f"AVERAGE STEPS TAKEN: {step_count / x_vals.shape[0]}")
+    print(f"AVERAGE ASCENT DIRS: {ascent_dir_count / x_vals.shape[0]}")
 
     
 
@@ -37,17 +40,18 @@ rose_pr_nograd = Problem(objective=rosenbrock, gradient=None)
 # Choose method
 method = ClassicalNewton(problem=rose_pr, use_exact_ls=False)
 # method = InexactLineSearch(problem=rose_pr)
-# method = GoodBroyden(problem=rose_pr) # TODO Not working
-# method = SymmetricBroyden(problem=rose_pr) # TODO Not working
-# method = BadBroyden(problem=rose_pr) # TODO Not working
+# method = GoodBroyden(problem=rose_pr)
+# method = SymmetricBroyden(problem=rose_pr)
+# method = BadBroyden(problem=rose_pr) # Not working!
 # method = DFP(problem=rose_pr)
 # method = BFGS(problem=rose_pr)
 
-FAILED_POINTS = np.array([
-    [-1.18315709,  1.40683587],
-    [0.95000535, 0.90914311],
-    [0.4431342 , 0.21549486],
-])
+if __name__ == "__main__":
+    FAILED_POINTS = np.array([
+        [-1.18315709,  1.40683587],
+        [0.95000535, 0.90914311],
+        [0.4431342 , 0.21549486],
+    ])
 
 # points = FAILED_POINTS
 #points = np.random.random((40, 2)) * 4 - 1
