@@ -1,16 +1,20 @@
 # NUMN21_optimization_project
 
+## Contributions
+
+Linn Preuss Jelvez, Lukas Nord, Scott Gibson, Orsolya Bosáková.
+
+Each team member has done the code individually and then we combined them into one coherent document.
+
+## Usage
+
+Simply install requirements, and run the `main.py` file.
+
 ## Plotting
 
 Contour plots for the Rosenbrock functions.
 
 Grid plots for the Hessian approximations from Quasi-Newton methods. The current comparison is the approximation from finite differences, but another alternative could be from `scipy.differentiate.hessian`, but that wasn't immediately compatible with the Chebyquad functions.
-
-## Sources
-
-1. Source for the inexact line search with Armijo-Wolfe conditions, and describes the cubic/quadratic interpolation for choosing prospective values of alpha during the line search.
-2. Source for the Broyden rank-1 and rank-2 updates.
-3. Source for the DFP and BFGS rank-2 updates.
 
 ## Images/Outputs
 
@@ -53,17 +57,6 @@ The output contains the number of steps taken.
 <img width="49%" height="583" alt="Screenshot 2026-10-12 at 22 36 09" src="https://github.com/user-attachments/assets/a9c30cba-c9f2-405f-927e-40eb8bd1724c" />
 <img width="49%" height="483" alt="Screenshot 2026-10-12 at 22 35 50" src="https://github.com/user-attachments/assets/6cbd0fb9-3655-4bc7-90db-bab8e84dc051" />
 
-
-
-
 ## TODO/IMPROVEMENTS
 
-- Make sure line search and all optimization methods do not crash often or at all on random starting locations.
-- Add full documentation to functions, and ensure code is well organized and parameterized.
-- Add tests?
 - Want to add CG and LBFGS method and comparison plot of their convergence (if time permits) - Orsi
-
-## Contributions
-Each team member has done the code individually and then we combined them into one coherent document.
-
- 

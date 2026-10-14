@@ -114,8 +114,10 @@ def analyze_chebyquad(name, method, size, x):
 
     draw_error_grid(H_errors)
 
+
+    print("--- FMIN_BFGS ---")
     xmin = so.fmin_bfgs(chebyquad,x,gradchebyquad)
-    print("FMIN_BFGS\n")
+    print()
 
 cheby_problem = Problem(chebyquad, gradchebyquad)
 
