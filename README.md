@@ -8,7 +8,7 @@ Each team member has done the code individually and then we combined them into o
 
 ## Usage
 
-Simply install requirements, and run the `main.py` file.
+Simply install requirements, and run the `main.py` file. Optionally, to generate the fractal found in the `img` folder, run the `parallell_fractals.py` file.
 
 ## Plotting
 
