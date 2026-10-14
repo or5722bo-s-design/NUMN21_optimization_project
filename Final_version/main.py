@@ -1,17 +1,14 @@
 import numpy as np
+import scipy.optimize as so
 
 from optimization import *
 from Rosenbrock_problem import rosenbrock, rosenbrock_gradient
+from chebyquad_problem import chebyquad, gradchebyquad
+from plot import draw_error_grid
 
 ### Run Optimizer on Rosenbrock ###
 
 rose_problem = Problem(rosenbrock, rosenbrock_gradient)
-
-# method = GoodBroyden(problem=rose_pr)
-# method = SymmetricBroyden(problem=rose_pr)
-# method = BadBroyden(problem=rose_pr) # Not working!
-# method = DFP(problem=rose_pr)
-# method = BFGS(problem=rose_pr)
 
 opts = [
     {
@@ -83,13 +80,48 @@ def analyze_solver(name, method, x_points, root):
 n = 40
 x_points = np.random.random((n, 2)) * 5 - 3
 root = [1., 1.]
+
+print("\nROSENBROCK FUNCTION\n")
+
 # Loop through all methods
 for opt in opts:
     name = opt["name"]
     method = opt["method"]
     analyze_solver(name, method, x_points, root)
-    
+
+print("\n\nCHEBYQUAD FUNCTION\n")
 
 ### Run BFGS on Chebyquad ###
 
+def analyze_chebyquad(name, method, size, x):
+    """
+    Runs chebyquad with the given method, and compares to the scipy BFGS optimizer.
+    
+    :param name: Name to display during analysis.
+    :param method: Optimization method.
+    :param size: Number of unknowns in the input space.
+    :param x: Starting point to kick off the algorithm.
+    """
+    
+    sol = method.solve(x)
+    steps = method.step_history
+    H_errors = method.error_history
+    print(f"--- {name} | {size=} ---")
+    print(f"\tCurrent function value: {chebyquad(sol)}")
+    print(f"\tIterations: {len(steps)-1}")
+    # print(f"\tFunction evaluations: TODO!")
+    # print(f"\tGradient evaluations: TODO!")
+
+    draw_error_grid(H_errors)
+
+    xmin = so.fmin_bfgs(chebyquad,x,gradchebyquad)
+    print("FMIN_BFGS\n")
+
+cheby_problem = Problem(chebyquad, gradchebyquad)
+
+for size in [4, 8, 11, 14]:
+    x0 = np.linspace(0, 1, size)
+    name = "BFGS (ours)"
+    method = BFGS(problem=cheby_problem)
+    analyze_chebyquad(name, method, size, x0)
 
