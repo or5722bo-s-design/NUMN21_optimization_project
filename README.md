@@ -54,25 +54,7 @@ The output contains the number of steps taken.
 <img width="49%" height="483" alt="Screenshot 2026-10-12 at 22 35 50" src="https://github.com/user-attachments/assets/6cbd0fb9-3655-4bc7-90db-bab8e84dc051" />
 
 
-2. Maybe a series of images showing an interesting example of line search? Could include graphs showing the process when just bisecting the interval each time, and another with the cubic interpolation logic.
 
-
-## Assigment Tasks
-
-### Task 5 
-Testing the performance of the Rosenbrock's function and demonstrating its behaviour with a contour plot.
-
-
-### Task 7
-Testing the inexact line search method on the Rosenbrock's function with the parameters given on page 37 of the book.
-
-
-
-### Task 11
-Computing the chebyquad function provided for the points $n=4,8,11$ and comparing it to the built in BFGS function.
-
-### Task 12
-Showing the quality of approximation of the inverse of the Hessian matrix with a growing number of iterations.
 
 ## TODO/IMPROVEMENTS
 
