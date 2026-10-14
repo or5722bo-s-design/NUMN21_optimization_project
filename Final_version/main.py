@@ -12,7 +12,7 @@ rose_problem = Problem(rosenbrock, rosenbrock_gradient)
 
 opts = [
     {
-        "name": "Classical Newton (exact ls)",
+        "name": "Classical Newton (exact line search)",
         "method": ClassicalNewton(problem=rose_problem, use_exact_ls=True),
     },
     {

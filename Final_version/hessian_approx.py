@@ -27,7 +27,7 @@ def finite_diffs(g, x, dx=1e-4):
     # Symmetrize
     return (G + G.transpose()) / 2
 
-def good_broyden_scott(H, s, y):
+def update_good_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -40,7 +40,7 @@ def good_broyden_scott(H, s, y):
         H = H + np.outer(s-Hy,s@H)/denom
     return H
 
-def bad_broyden_scott(H, s, y):
+def update_bad_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -52,7 +52,7 @@ def bad_broyden_scott(H, s, y):
         H = H + np.outer(s-H@y,y) / denom
     return H
 
-def sym_broyden_scott(H, s, y):
+def update_sym_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -67,14 +67,8 @@ def sym_broyden_scott(H, s, y):
         
         H = H + a * np.outer(u, u)
     return H
-def sym_broyden_linn(H, s, y):
-    pass
-def sym_broyden_orsolya(H, s, y):
-    pass
-def sym_broyden_lukas(H, s, y):
-    pass
 
-def DFP_scott(H, s, y):
+def update_DFP(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -88,14 +82,8 @@ def DFP_scott(H, s, y):
     if abs(denom2) > 1e-12:
         H = H + np.outer(s,s)/denom2
     return H
-def DFP_linn(H, s, y):
-    pass
-def DFP_orsolya(H, s, y):
-    pass
-def DFP_lukas(H, s, y):
-    pass
 
-def BFGS_scott(H, s, y):
+def update_BFGS(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -112,9 +100,3 @@ def BFGS_scott(H, s, y):
 
         H = H + up1 - up2
     return H
-def BFGS_linn(H, s, y):
-    pass
-def BFGS_orsolya(H, s, y):
-    pass
-def BFGS_lukas(H, s, y):
-    pass
