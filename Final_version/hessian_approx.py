@@ -33,7 +33,6 @@ def good_broyden_scott(H, s, y):
     :param s: Delta between previous location and current location.
     :param y: Delta between the current grad and the previous grad.
     """
-    Hy = H@y
     denom = np.dot(s, Hy)
     if abs(denom) > 1e-12:
         # Rank 1 update
