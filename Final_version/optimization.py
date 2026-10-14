@@ -224,7 +224,7 @@ class GoodBroyden(QNewton):
             s = x - self.xp
             y = g(x) - self.gp
 
-            self.H_inv = good_broyden(self.H_inv, s, y)
+            self.H_inv = update_good_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -250,7 +250,7 @@ class BadBroyden(QNewton):
             s = x - self.xp
             y = g(x) - self.gp
 
-            self.H_inv = bad_broyden(self.H_inv, s, y)
+            self.H_inv = update_bad_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -277,7 +277,7 @@ class SymmetricBroyden(QNewton):
             s = x - self.xp
             y = g(x) - self.gp
 
-            self.H_inv = sym_broyden(self.H_inv, s, y)
+            self.H_inv = update_sym_broyden(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -300,7 +300,7 @@ class DFP(QNewton):
             s = x - self.xp
             y = g(x) - self.gp
 
-            self.H_inv = DFP(self.H_inv, s, y)
+            self.H_inv = update_DFP(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 
@@ -323,7 +323,7 @@ class BFGS(QNewton):
             s = x - self.xp
             y = g(x) - self.gp
 
-            self.H_inv = BFGS(self.H_inv, s, y)
+            self.H_inv = update_BFGS(self.H_inv, s, y)
         else:
             self.H_inv = np.identity(x.shape[0])
 

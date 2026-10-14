@@ -27,7 +27,7 @@ def finite_diffs(g, x, dx=1e-4):
     # Symmetrize
     return (G + G.transpose()) / 2
 
-def good_broyden(H, s, y):
+def update_good_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -40,7 +40,7 @@ def good_broyden(H, s, y):
         H = H + np.outer(s-Hy,s@H)/denom
     return H
 
-def bad_broyden(H, s, y):
+def update_bad_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -52,7 +52,7 @@ def bad_broyden(H, s, y):
         H = H + np.outer(s-H@y,y) / denom
     return H
 
-def sym_broyden(H, s, y):
+def update_sym_broyden(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -68,7 +68,7 @@ def sym_broyden(H, s, y):
         H = H + a * np.outer(u, u)
     return H
 
-def DFP(H, s, y):
+def update_DFP(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
@@ -83,7 +83,7 @@ def DFP(H, s, y):
         H = H + np.outer(s,s)/denom2
     return H
 
-def BFGS(H, s, y):
+def update_BFGS(H, s, y):
     """
     :param H: Previous Hess inv approx
     :param s: Delta between previous location and current location.
