@@ -5,6 +5,7 @@ def draw_contour(
         fn, steps=[],
         print_labels = False,
         n_levels = 7, ls_off = 100, le_off = 10,
+        title = "2D Contour Graph", steps_label="Steps"
     ):
     """
     Draw a contour plot of the function. Expects two inputs to one output.
@@ -43,7 +44,7 @@ def draw_contour(
         nd_steps = np.array(steps)
         x, y = nd_steps[:,0], nd_steps[:,1]
         ax.plot(x, y, color='blue', zorder=4)
-        ax.scatter(x, y, color='blue', s=42, zorder=5, label="Steps")
+        ax.scatter(x, y, color='blue', s=42, zorder=5, label=steps_label)
         plt.scatter(
             x[-1], y[-1],
             color='blue', edgecolor='red',
@@ -52,7 +53,7 @@ def draw_contour(
         )
 
     # Labels and styling
-    ax.set_title("2D Contour Graph", fontsize=16, weight=700, pad=12)
+    ax.set_title(title, fontsize=16, weight=700, pad=12)
     ax.set_xlabel("X1")
     ax.set_ylabel("X2")
     ax.grid(True, linestyle=":", alpha=0.5)
