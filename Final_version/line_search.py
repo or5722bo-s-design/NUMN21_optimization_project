@@ -197,10 +197,11 @@ def arm_wolf_search(problem, x, s, alpha0 = 1.0):
             alpha = pick_value_cubic(2*alpha - alpha_prev, min(mu, alpha + tau1*(alpha-alpha_prev)))
             alpha_prev = tmp
 
-    if not flipped_s:
-        exact_sol = exact_line_search(problem, x, s)
-        inexact_sol = solution
-        end = max(exact_sol, inexact_sol) * 2
-        plot_phi(phi, phi_prime, 0, 1.25 * end, exact_sol, inexact_sol)
+    # Uncomment for plotting of found solution and cubic interpolation
+    # if not flipped_s:
+    #     exact_sol = exact_line_search(problem, x, s)
+    #     inexact_sol = solution
+    #     end = max(exact_sol, inexact_sol) * 2
+    #     plot_phi(phi, phi_prime, 0, 1.25 * end, exact_sol, inexact_sol)
     
     return solution if not flipped_s else -solution
