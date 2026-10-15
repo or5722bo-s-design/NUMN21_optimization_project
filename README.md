@@ -63,4 +63,3 @@ The output contains the number of steps taken.
 
 ## TODO/IMPROVEMENTS
 
-- Want to add CG and LBFGS method and comparison plot of their convergence (if time permits) - Orsi
