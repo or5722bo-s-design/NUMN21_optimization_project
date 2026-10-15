@@ -54,6 +54,6 @@ if __name__ == "__main__":
     ])
 
 # points = FAILED_POINTS
-#points = np.random.random((40, 2)) * 4 - 1
-points = np.array([[0.0, -0.8]])
+points = np.random.random((40, 2)) * 4 - 1
+# points = np.array([[-1.18315709,  1.40683587]])
 run_rosenbrock(method, points, with_plotting=True)

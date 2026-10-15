@@ -1,5 +1,56 @@
 import numpy as np
 import scipy.optimize as so
+import matplotlib.pyplot as plt
+
+### Graph Functions ###
+
+def plot_phi(phi, phi_prime, a, b, exact_sol, inexact_sol):
+    """
+    Plot the changing function in the step direction on interval [a, b].
+    """
+
+    x = np.linspace(a, b, 200)
+    y = [phi(x_i) for x_i in x]
+
+    # Plot phi(α)
+    plt.plot(x, y, label="phi(α)", color="blue", linewidth=2)
+
+    # Cubic interpolation formula
+    f0 = phi(a)
+    f1 = phi(b)
+    fp0 = (b-a)*phi_prime(a)
+    fp1 = (b-a)*phi_prime(b)
+
+    eta = 3*(f1-f0)-2*fp0-fp1
+    xi = fp0+fp1-2*(f1-f0)
+
+    # Plot cubic interpolation
+    z = (x - a) / (b - a)
+    y = [f0 + fp0*z_i + eta*(z_i**2) + xi*(z_i**3) for z_i in z]
+    plt.plot(x, y, label="cubic", color="red", linewidth=2, linestyle="--", zorder=10)
+
+    # Plot exact line search solution and our found solution
+    plt.plot(
+        exact_sol, phi(exact_sol), label="Exact Search Sol", 
+        marker="*", markersize=12, zorder=20,
+        color="gold", markeredgecolor="black", markeredgewidth=1.5,
+    )
+    plt.plot(
+        inexact_sol, phi(inexact_sol), label="Inexact Search Sol",
+        marker="D", markersize=10, zorder=19,
+        color="green", markeredgecolor="black", markeredgewidth=1.5,
+    )
+
+    plt.legend()
+    plt.show()
+
+# TODO One for graphing phi(α), should have components:
+#  - phi(α)
+#  - Armijo condition
+#  - Wolfe condition?
+#  - Cubic interpolation over interval [0, mu]
+
+# TODO One for graphing the cubic interpolation
 
 ### HELPER FUNCTIONS ###
 
@@ -145,4 +196,11 @@ def arm_wolf_search(problem, x, s, alpha0 = 1.0):
             tmp = alpha
             alpha = pick_value_cubic(2*alpha - alpha_prev, min(mu, alpha + tau1*(alpha-alpha_prev)))
             alpha_prev = tmp
+
+    if not flipped_s:
+        exact_sol = exact_line_search(problem, x, s)
+        inexact_sol = solution
+        end = max(exact_sol, inexact_sol) * 2
+        plot_phi(phi, phi_prime, 0, 1.25 * end, exact_sol, inexact_sol)
+    
     return solution if not flipped_s else -solution
