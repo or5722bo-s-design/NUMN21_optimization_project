@@ -6,7 +6,7 @@ from hessian_approx import *
 class Problem:
     def __init__(self, objective, gradient=None):
         self.objective = objective
-        if gradient != None:
+        if gradient is not None:
             self.gradient = gradient
         else:
             self.gradient = self.approx_grad()
