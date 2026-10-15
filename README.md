@@ -42,20 +42,24 @@ The output contains the number of steps taken.
 <img width="49%" height="492" alt="Screenshot 2026-10-12 at 22 31 54" src="https://github.com/user-attachments/assets/435451ae-f612-4eea-84ea-694d30b68db8" />
 
 #### Good Broyden
-<img width="49%" height="586" alt="Screenshot 2026-10-12 at 22 48 38" src="https://github.com/user-attachments/assets/36ca03b7-2481-40cc-ba5a-b3b83dd15759" />
-<img width="49%" height="482" alt="Screenshot 2026-10-12 at 22 48 14" src="https://github.com/user-attachments/assets/5933dbae-463a-4e19-9510-fc3d97924ec3" />
+<img width="49%" height="586" alt="Screenshot 2026-10-15 at 02 38 51" src="https://github.com/user-attachments/assets/717897a3-ca50-41ae-85ed-4f7e35c1b301" />
+<img width="49%" height="480" alt="Screenshot 2026-10-15 at 02 38 31" src="https://github.com/user-attachments/assets/2092758a-b680-4046-900a-5233efe587a4" />
+
 
 #### Symmetric Broyden
-<img width="49%" height="486" alt="Screenshot 2026-10-12 at 22 45 50" src="https://github.com/user-attachments/assets/5d210095-abdf-423a-942c-a6b853b6bb6d" />
-<img width="49%" height="579" alt="Screenshot 2026-10-12 at 22 41 36" src="https://github.com/user-attachments/assets/da1a7304-1fec-438d-8170-7e9b16f6fe06" />
+<img width="49%" height="582" alt="Screenshot 2026-10-15 at 02 39 41" src="https://github.com/user-attachments/assets/8894cdcb-a8c2-4da7-a221-efc79fee7bf3" />
+<img width="49%" height="481" alt="Screenshot 2026-10-15 at 02 39 25" src="https://github.com/user-attachments/assets/ef15d8b4-37bb-40ff-981a-9eeadf92c0af" />
+
 
 #### DFP
-<img width="49%" height="583" alt="Screenshot 2026-10-12 at 22 35 14" src="https://github.com/user-attachments/assets/335b11e9-77ac-4c01-8099-bb55e4e730dc" />
-<img width="49%" height="486" alt="Screenshot 2026-10-12 at 22 34 55" src="https://github.com/user-attachments/assets/da70e64a-50cd-4fb0-9d7b-c7952a432168" />
+<img width="49%" height="580" alt="Screenshot 2026-10-15 at 02 40 31" src="https://github.com/user-attachments/assets/ef5dc791-4301-4215-a207-12a2a26f26fc" />
+<img width="49%" height="477" alt="Screenshot 2026-10-15 at 02 40 18" src="https://github.com/user-attachments/assets/1a01b62c-fd1a-432b-aa0d-6c8f225211e2" />
+
 
 #### BFGS
-<img width="49%" height="583" alt="Screenshot 2026-10-12 at 22 36 09" src="https://github.com/user-attachments/assets/a9c30cba-c9f2-405f-927e-40eb8bd1724c" />
-<img width="49%" height="483" alt="Screenshot 2026-10-12 at 22 35 50" src="https://github.com/user-attachments/assets/6cbd0fb9-3655-4bc7-90db-bab8e84dc051" />
+<img width="49%" height="582" alt="Screenshot 2026-10-15 at 02 41 31" src="https://github.com/user-attachments/assets/226e4004-0ecb-4998-a66f-edb32ba60c7c" />
+<img width="49%" height="481" alt="Screenshot 2026-10-15 at 02 41 15" src="https://github.com/user-attachments/assets/bab24c77-08b1-4536-b41b-04270761498e" />
+
 
 ## TODO/IMPROVEMENTS
 
